@@ -25,3 +25,5 @@ check_disk_space (){
 for NODE in {1..10}; do check_disk_space; done
 
 if [[ "$SEND" == 1 ]]; then mail -s "Disk usage over limit on Onapp Server" $EMAIL < $DIR/$LOG; fi
+
+test
