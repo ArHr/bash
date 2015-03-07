@@ -7,8 +7,8 @@ SERVICE_3='amavisd'
 DATE=`date`
 SERVER=`hostname`
 
-DIR='/etc/scripts/mxmonitor/'
-LOG="$DIRmxmonitor.log"
+DIR='/etc/scripts/mxmonitor'
+LOG='mxmonitor.log'
 EMAIL=''
 
 QUEUE=`mailq 2>/dev/null |tail -n1 | awk '{print$5}'`
@@ -16,22 +16,22 @@ QUEUE_LIMIT=1000
 
 SEND=0
 
-echo $DATE > $LOG
+echo $DATE > $DIR/$LOG
 
 restart_success () {
-    printf "\n\t $SERVICE has been restarted\n\nPlease connect to $SERVER and check service status\n" >> $LOG
+    printf "\n\t $SERVICE has been restarted\n\nPlease connect to $SERVER and check service status\n" >> $DIR/$LOG
 }
 
 restart_fail () {
-    printf "\n\t $SERVICE has failed to restart\n\nPlease connect to $SERVER and check service status\n" >> $LOG
+    printf "\n\t $SERVICE has failed to restart\n\nPlease connect to $SERVER and check service status\n" >> $DIR/$LOG
 }
 
 get_status (){
 for SERVICE in $SERVICE_1 $SERVICE_2 $SERVICE_3;
 do
-    printf "\n============================================\n $SERVICE \n============================================\n\t " >> $LOG
-    /etc/init.d/$SERVICE status >> $LOG
-    #printf "\n\t " >> $LOG
+    printf "\n============================================\n $SERVICE \n============================================\n\t " >> $DIR/$LOG
+    /etc/init.d/$SERVICE status >> $DIR/$LOG
+    #printf "\n\t " >> $DIR/$LOG
 done
 }
 
@@ -56,23 +56,23 @@ check_process (){
 }
 
 check_queue (){
-    printf "\n============================================\n\t Mail Queue Status \n============================================\n" >> $LOG
-    printf "\n\t$SERVER -- there is $QUEUE requests in mail queue. \n" >> $LOG
+    printf "\n============================================\n\t Mail Queue Status \n============================================\n" >> $DIR/$LOG
+    printf "\n\t$SERVER -- there is $QUEUE requests in mail queue. \n" >> $DIR/$LOG
 	
-	if [[ "$QUEUE" -gt "QUEUE_LIMIT" ]]; then SEND=1; echo $SEND; printf "\t QUEUE LARGER THEN 1000\n" >> $LOG; fi
+	if [[ "$QUEUE" -gt "QUEUE_LIMIT" ]]; then SEND=1; echo $SEND; printf "\t QUEUE LARGER THEN 1000\n" >> $DIR/$LOG; fi
 	
-    printf "\n=============================================\n" >> $LOG
+    printf "\n=============================================\n" >> $DIR/$LOG
 }
 
 check_queue
 get_status
 
-printf "\n============================================\n\t Attempting to restart failed services \n===========================================\n" >> $LOG
+printf "\n============================================\n\t Attempting to restart failed services \n===========================================\n" >> $DIR/$LOG
 
 for SERVICE in $SERVICE_1 $SERVICE_2 $SERVICE_3; do check_process; done
 
-printf "\n\n******************************************************************************************\n\t\t\t  Status after service restart attempt  \n******************************************************************************************\n" >> $LOG
+printf "\n\n******************************************************************************************\n\t\t\t  Status after service restart attempt  \n******************************************************************************************\n" >> $DIR/$LOG
 get_status
 check_queue
 
-if [[ "$SEND" == 1 ]]; then mail -s "Service issues on $SERVER" $EMAIL < $LOG; fi
+if [[ "$SEND" == 1 ]]; then mail -s "Service issues on $SERVER" $EMAIL < $DIR/$LOG; fi
