@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Folder where WordPress is installed
-WPROOT="public_html"
+WPROOT="./"
 #Get database used by WordPress
 DATABASE=`grep DB_NAME $WPROOT/wp-config.php |awk -F\' '{print$4}'`
 #Get WordPress database user
